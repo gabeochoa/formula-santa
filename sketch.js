@@ -1,16 +1,42 @@
 let ground_height;
 let c;
+let fake_car = null;
 
 let AUTO_MOVE = true;
 let MOUSE_DOWN = false;
 let ENABLE_OFFROAD = false;
+let CAR_UPDATE = 25;
 let isGame = true;
 let path;
-const sc = 0.5;
+const sc = 1; //0.5;
 
+let p = null;
+const cs = {
+  NOTC: 0,
+  QUERY: 1,
+  READY: 2,
+  GAME: 3
+};
+let peername;
+let myid;
 function setup() {
   editor_setup();
   game_setup();
+  p = new P();
+
+  const ptag = document.getElementById("peerp");
+  const pinput = document.getElementById("peerinput");
+  myid = document.getElementById("myid");
+  peername = document.getElementById("peerid");
+  const but = document.getElementById("joinbtn");
+  but.onclick = () => {
+    join_peer(pinput);
+  };
+}
+
+function join_peer(pinput) {
+  const pee = pinput.value;
+  p.connect_to(pee);
 }
 
 function draw() {
@@ -53,7 +79,7 @@ function mouseReleased(event) {
   }
 }
 function keyTyped() {
-  console.log("keytyped", key);
+  // console.log("keytyped", key);
   if (key == "0") {
     isGame = !isGame;
     console.log("is game: ", isGame);
@@ -103,7 +129,6 @@ function keyTyped() {
 }
 
 function game_setup() {
-  // something
   c = new Car(210, 400);
 }
 
@@ -161,7 +186,7 @@ function draw_road() {
 
 function game_draw() {
   draw_background();
-  draw_road();
+  // draw_road();
   draw_minimap();
 
   game_keyinput();
@@ -213,6 +238,7 @@ function draw_minimap() {
   translate(0, 0); //-150);
   path.draw_mini(sc);
   c.draw(sc);
+  if (fake_car) fake_car.draw(sc);
   pop();
 }
 function draw_background() {

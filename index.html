@@ -2,6 +2,7 @@
     <script src="p5.js"></script>
     <script src="p5.dom.min.js"></script>
     <script src="p5.sound.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <meta charset="utf-8">
 
@@ -9,14 +10,16 @@
   <body>
     <input id="cb" type="text" hidden>
     <div style="padding-left: 15px">
-        <p style="white-space: pre-line">
         zero to toggle game/editor
-
-
+        <div style="width: 50%">
+        <p style="white-space: pre-line">
         Game Mode
             o to turn off automove
             g to enable offroad 
-
+        </p>
+        </div>
+        <div style="width: 50%">
+        <p style="white-space: pre-line">
         Editor Mode
             mouse drag to change course
             t to add pivot point
@@ -24,10 +27,22 @@
             c to toggle closed loop
             o to straighten lines
         </p>
+        </div>
+        <br/>
+        <p id="peerp" >
+            My Id: <span id="myid"> ...generating id </span>
+            <br/>
+            Peer: 
+            <input id="peerinput" type="text" >
+            <button id="joinbtn"> Join Peer </button>
+            <br/>
+            Connected to: <span id="peerid"> noone :( </span>
+        </p>
     </div>
     <script src="bezier.js"></script>
     <script src="util.js"></script>
     <script src="path.js"></script>
+    <script src="peer.js"></script>
     <script src="car.js"></script>
     <script src="sketch.js"></script>
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>

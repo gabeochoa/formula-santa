@@ -257,10 +257,13 @@ class Path {
     }
     return btoa(JSON.stringify(output));
   }
+  import_input(text) {
+    this.import_points(text.value());
+  }
   import_points(text) {
     this.redraw = true;
     try {
-      const b64 = atob(text.value());
+      const b64 = atob(text);
       const pts = JSON.parse(b64);
       this.points = [];
       for (const p of pts) {

@@ -27,5 +27,5 @@ function export_path(inp) {
 
 function import_path(text) {
   console.log("importing");
-  path.import_points(text);
+  path.import_input(text);
 }

@@ -8,11 +8,36 @@ class Car {
     this.h = 20;
   }
 
+  serialize(o) {
+    if (o === undefined) {
+      return JSON.stringify({
+        pos: this.serialize(this.pos),
+        vel: this.serialize(this.vel),
+        acc: this.serialize(this.acc),
+        angle: this.angle
+      });
+    }
+    if (typeof o === "object") {
+      return [o.x, o.y];
+    }
+  }
+
+  to_vec(a) {
+    return createVector(a[0], a[1]);
+  }
+
+  deserialize(d) {
+    const data = JSON.parse(d);
+    this.pos = this.to_vec(data["pos"]);
+    this.vel = this.to_vec(data["vel"]);
+    this.acc = this.to_vec(data["acc"]);
+    this.angle = data["angle"];
+  }
+
   m_input(x, y) {
     const MAX_ACCEL = 0.05;
     const TURN_ANGLE = 0.05;
     const i = createVector(0, y).mult(MAX_ACCEL);
-
     if (x != 0) {
       this.angle += x * TURN_ANGLE;
     }
@@ -30,30 +55,13 @@ class Car {
     }
     this.vel.mult(road_mult);
     this.acc.mult(0.5);
-
     this.vel.add(this.acc);
     this.vel.limit(1);
     this.pos.add(this.vel);
   }
 
-  drawArrow(base, vec, myColor) {
-    push();
-    stroke(myColor);
-    strokeWeight(3);
-    fill(myColor);
-    translate(base.x, base.y);
-    line(0, 0, vec.x, vec.y);
-    rotate(vec.heading());
-    let arrowSize = 7;
-    translate(vec.mag() - arrowSize, 0);
-    triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
-    pop();
-  }
-
   draw_big() {
-    push();
     rect(0, height - ground_height, 100, 30);
-    pop();
   }
 
   draw() {
