@@ -185,12 +185,14 @@ class Path {
     this.setStartEndPoints();
   }
   draw() {
+    push();
     if (this.redraw) {
       this.draw_points = this.evenlyspaced(10, 1);
-      console.log("REDRAW");
+      const [vert, tri] = this.gen_mesh(50);
+      this.vert = vert;
       this.redraw = false;
     }
-    push();
+
     stroke(255);
     fill(0);
     for (var i = 0; i < this.length(); i++) {
@@ -201,26 +203,7 @@ class Path {
       line(pts[1].x, pts[1].y, pts[0].x, pts[0].y);
       line(pts[2].x, pts[2].y, pts[3].x, pts[3].y);
     }
-    strokeWeight(5);
-    stroke(145, 255, 190);
     noFill();
-    for (var i = 0; i < this.length(); i++) {
-      const pts = this.get(i);
-      if (!pts[1]) {
-        continue;
-      }
-      bezier(
-        pts[0].x,
-        pts[0].y,
-        pts[1].x,
-        pts[1].y,
-        pts[2].x,
-        pts[2].y,
-        pts[3].x,
-        pts[3].y
-      );
-    }
-    stroke(20, 255, 55);
     strokeWeight(10);
     stroke(255);
     for (var i = 0; i < this.points.length; i++) {
@@ -232,9 +215,15 @@ class Path {
       const p = this.points[i];
       point(p.x, p.y);
     }
+    stroke(145, 255, 190);
     strokeWeight(5);
-    stroke(255, 0, 255);
     for (const p of this.draw_points) {
+      point(p.x, p.y);
+    }
+
+    stroke(145, 255, 190);
+    strokeWeight(5);
+    for (const p of this.vert) {
       point(p.x, p.y);
     }
     pop();
@@ -297,10 +286,8 @@ class Path {
     }
     return output;
   }
-  gen_mesh() {
+  gen_mesh(roadWidth) {
     const p = this.draw_points;
-    const roadWidth = 1;
-    const spacing = 1;
     const verts = Array(p.length * 2).fill(undefined);
     const tri = Array(2 * 3 * (p.length - 1) + (this.isClosed ? 2 : 0)).fill(
       undefined
@@ -316,9 +303,9 @@ class Path {
         forward.add(vsub(p[i], p[i - 1]));
       }
       forward.normalize();
-      const left = createVector(-forward.y, forward.x);
-      verts[vind] = vadd(p[i], left).mult(roadWidth * 0.5);
-      verts[vind + 1] = vsub(p[i], left).mult(roadWidth * 0.5);
+      const left = createVector(-forward.y, forward.x).mult(roadWidth * 0.5);
+      verts[vind] = vadd(p[i], left);
+      verts[vind + 1] = vsub(p[i], left);
 
       if (i < p.length - 1) {
         tri[tind] = vind;
