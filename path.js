@@ -188,11 +188,20 @@ class Path {
     push();
     if (this.redraw) {
       this.draw_points = this.evenlyspaced(10, 1);
-      const [vert, tri] = this.gen_mesh(50);
+      const [vert, tri] = this.gen_mesh(25);
       this.vert = vert;
       this.redraw = false;
     }
 
+    stroke(190);
+    strokeWeight(5);
+    for (let i = 0; i < this.vert.length - 1; i += 2) {
+      const a = this.vert[i];
+      const b = this.vert[i + 1];
+      line(a.x, a.y, b.x, b.y);
+    }
+
+    strokeWeight(2);
     stroke(255);
     fill(0);
     for (var i = 0; i < this.length(); i++) {
@@ -215,17 +224,12 @@ class Path {
       const p = this.points[i];
       point(p.x, p.y);
     }
-    stroke(145, 255, 190);
+    stroke(255);
     strokeWeight(5);
     for (const p of this.draw_points) {
       point(p.x, p.y);
     }
 
-    stroke(145, 255, 190);
-    strokeWeight(5);
-    for (const p of this.vert) {
-      point(p.x, p.y);
-    }
     pop();
   }
   export_points() {
@@ -287,7 +291,7 @@ class Path {
     return output;
   }
   gen_mesh(roadWidth) {
-    const p = this.draw_points;
+    const p = this.evenlyspaced(2, 1);
     const verts = Array(p.length * 2).fill(undefined);
     const tri = Array(2 * 3 * (p.length - 1) + (this.isClosed ? 2 : 0)).fill(
       undefined

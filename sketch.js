@@ -62,8 +62,12 @@ function setup() {
   VEC_RT = createVector(1, 0).mult(SCALE);
   path = new Path(200, 200);
 
-  inp = createElement("textarea", path.export_points());
+  DEFAULT_PATH =
+    "W1sxMDAsMjAwXSxbMTUwLDE1MF0sWzI1MCwyNTBdLFszMDAsMjAwXSxbMzUwLDE1MF0sWzM2NS41LDE3OS41XSxbNDMxLDE1OV0sWzQ5Ni41LDEzOC41XSxbNDkwLjUsMjg2XSxbNTUwLDQxM10sWzYwOS41LDU0MF0sWzI5MSw0NTBdLFsyNjMsNTMzXSxbMTE5LjUsNTkzXSxbMzI3LDI2MV0sWzEyNywzNjddLFszOS41LDI4MF0sWzUwLDI1MF1d";
+
+  inp = createElement("textarea", DEFAULT_PATH);
   inp.size(300);
+  import_path(inp);
 
   button = createButton("export path");
   button.mousePressed(() => export_path(inp));
