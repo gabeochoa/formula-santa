@@ -3,6 +3,7 @@ let c;
 
 let AUTO_MOVE = true;
 let MOUSE_DOWN = false;
+let ENABLE_OFFROAD = false;
 let isGame = true;
 let path;
 const sc = 0.5;
@@ -60,6 +61,9 @@ function keyTyped() {
   }
   if (key == "o") {
     AUTO_MOVE = !AUTO_MOVE;
+  }
+  if (key == "g") {
+    ENABLE_OFFROAD = !ENABLE_OFFROAD;
   }
 
   if (isGame) {
@@ -180,6 +184,9 @@ function closest_dp() {
 
 function gen_road_mult() {
   const [closest, _] = closest_dp();
+  if (ENABLE_OFFROAD) {
+    return 1;
+  }
   if (closest < 25) {
     return 0.98;
   }
