@@ -38,9 +38,11 @@ function clipboard(txt) {
   cb.style.display = "none";
 }
 
-function export_path() {
+function export_path(inp) {
   console.log("exporting");
-  clipboard(path.export_points());
+  const text = path.export_points();
+  clipboard(text);
+  inp.value(text);
 }
 
 function import_path(text) {
@@ -60,11 +62,11 @@ function setup() {
   VEC_RT = createVector(1, 0).mult(SCALE);
   path = new Path(200, 200);
 
-  button = createButton("export path");
-  button.mousePressed(export_path);
-
   inp = createElement("textarea", path.export_points());
   inp.size(300);
+
+  button = createButton("export path");
+  button.mousePressed(() => export_path(inp));
 
   button = createButton("import path");
   button.mousePressed(() => import_path(inp));

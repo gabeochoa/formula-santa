@@ -186,7 +186,7 @@ class Path {
   }
   draw() {
     if (this.redraw) {
-      this.draw_points = this.evenlyspaced(0.1, 1);
+      this.draw_points = this.evenlyspaced(10, 1);
       console.log("REDRAW");
       this.redraw = false;
     }
@@ -241,7 +241,7 @@ class Path {
   }
   export_points() {
     let output = [];
-    for (const p of path.points) {
+    for (const p of this.points) {
       output.push([p.x, p.y]);
     }
     return btoa(JSON.stringify(output));
@@ -296,5 +296,42 @@ class Path {
       }
     }
     return output;
+  }
+  gen_mesh() {
+    const p = this.draw_points;
+    const roadWidth = 1;
+    const spacing = 1;
+    const verts = Array(p.length * 2).fill(undefined);
+    const tri = Array(2 * 3 * (p.length - 1) + (this.isClosed ? 2 : 0)).fill(
+      undefined
+    );
+    let vind = 0;
+    let tind = 0;
+    for (let i = 0; i < p.length; i++) {
+      let forward = createVector(0, 0);
+      if (i < p.length - 1) {
+        forward.add(vsub(p[i + 1], p[i]));
+      }
+      if (i > 0) {
+        forward.add(vsub(p[i], p[i - 1]));
+      }
+      forward.normalize();
+      const left = createVector(-forward.y, forward.x);
+      verts[vind] = vadd(p[i], left).mult(roadWidth * 0.5);
+      verts[vind + 1] = vsub(p[i], left).mult(roadWidth * 0.5);
+
+      if (i < p.length - 1) {
+        tri[tind] = vind;
+        tri[tind + 1] = vind + 2;
+        tri[tind + 2] = vind + 1;
+
+        tri[tind + 3] = vind + 1;
+        tri[tind + 4] = vind + 2;
+        tri[tind + 5] = vind + 3;
+      }
+      tind += 6;
+      vind += 2;
+    }
+    return [verts, tri];
   }
 }
