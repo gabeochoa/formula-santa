@@ -26,8 +26,8 @@ class Car {
     if (c != null) {
       const p3 = path.draw_points[(c + 3) % path.draw_points.length];
       target = p5.Vector.sub(p3, this.pos);
+      this.acc.add(vsub(target, this.vel));
     }
-    this.acc.add(vsub(target, this.vel));
     this.vel.mult(road_mult);
     this.acc.mult(0.5);
 
