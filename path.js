@@ -276,8 +276,7 @@ class Path {
         p5.Vector.dist(p[1], p[2]) +
         p5.Vector.dist(p[2], p[3]);
       const estCurve = p5.Vector.dist(p[0], p[3]) + netLength;
-      const divisions = estCurve * resolution * 10;
-
+      const divisions = estCurve * resolution * 0.2;
       let t = 0;
       while (t <= 1) {
         t += 1.0 / divisions;
