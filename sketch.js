@@ -5,7 +5,7 @@ let AUTO_MOVE = true;
 let MOUSE_DOWN = false;
 let isGame = true;
 let path;
-const sc = 0.25;
+const sc = 0.5;
 
 function setup() {
   editor_setup();
