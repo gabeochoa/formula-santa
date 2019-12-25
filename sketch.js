@@ -1,67 +1,25 @@
-let c = null;
-const DEBUG = false;
-let t_start;
-let t_elapsed = 0;
 let ground_height;
 
 let MOUSE_DOWN = false;
-const GAME_STATE = {
-  NONE: 0,
-  DRIVING: 1,
-  EDIT: 2
-};
-const STATE = GAME_STATE.EDIT;
-let track = null;
-let path = null;
-
-let VEC_UP;
-let VEC_DN;
-let VEC_LF;
-let VEC_RT;
-function vadd(a, b) {
-  return p5.Vector.add(a, b);
-}
-function vsub(a, b) {
-  return p5.Vector.sub(a, b);
-}
-function vmult(a, b) {
-  return p5.Vector.mult(a, b);
-}
-
-function clipboard(txt) {
-  console.log(txt);
-  var cb = document.getElementById("cb");
-  cb.value = txt;
-  cb.style.display = "block";
-  cb.select();
-  document.execCommand("copy");
-  cb.style.display = "none";
-}
-
-function export_path(inp) {
-  console.log("exporting");
-  const text = path.export_points();
-  clipboard(text);
-  inp.value(text);
-}
-
-function import_path(text) {
-  console.log("importing");
-  path.import_points(text);
-}
+let isGame = true;
+let path;
 
 function setup() {
-  t_start = millis();
+  editor_setup();
+}
+
+function draw() {
+  if (!isGame) {
+    editor_draw();
+  } else {
+    game_draw();
+  }
+}
+
+function editor_setup() {
   createCanvas(800, 600);
   ground_height = 600 * (3 / 5);
-
-  SCALE = 100;
-  VEC_UP = createVector(0, -1).mult(SCALE);
-  VEC_DN = createVector(0, 1).mult(SCALE);
-  VEC_LF = createVector(-1, 0).mult(SCALE);
-  VEC_RT = createVector(1, 0).mult(SCALE);
-  path = new Path(200, 200);
-
+  path = new Path();
   DEFAULT_PATH =
     "W1sxMDAsMjAwXSxbMTUwLDE1MF0sWzI1MCwyNTBdLFszMDAsMjAwXSxbMzUwLDE1MF0sWzM2NS41LDE3OS41XSxbNDMxLDE1OV0sWzQ5Ni41LDEzOC41XSxbNDkwLjUsMjg2XSxbNTUwLDQxM10sWzYwOS41LDU0MF0sWzI5MSw0NTBdLFsyNjMsNTMzXSxbMTE5LjUsNTkzXSxbMzI3LDI2MV0sWzEyNywzNjddLFszOS41LDI4MF0sWzUwLDI1MF1d";
 
@@ -91,6 +49,17 @@ function mouseReleased(event) {
 }
 function keyTyped() {
   console.log("keytyped", key);
+  if (key == "0") {
+    isGame = !isGame;
+    console.log("is game: ", isGame);
+    return;
+  }
+
+  if (isGame) {
+    return;
+  }
+  // EDITOR ONLY
+
   if (key == "t") {
     const mp = createVector(mouseX, mouseY);
     console.log(mp);
@@ -122,6 +91,14 @@ function keyTyped() {
   }
 }
 
+function game_draw() {
+  draw_background();
+  draw_minimap();
+}
+
+function draw_minimap() {
+  path.draw_mini();
+}
 function draw_background() {
   push();
   noStroke();
@@ -145,8 +122,7 @@ function draw_road() {
   pop();
 }
 
-function draw() {
-  t_elapsed = millis() - t_start;
+function editor_draw() {
   background(0);
   // draw_background();
   // draw_road();

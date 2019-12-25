@@ -1,12 +1,6 @@
 class Path {
-  constructor(x, y) {
-    let start = createVector(x, y);
-    this.points = [
-      vadd(start, VEC_LF),
-      vadd(start, vadd(VEC_LF, VEC_UP).mult(0.5)),
-      vadd(start, vadd(VEC_RT, VEC_DN).mult(0.5)),
-      vadd(start, VEC_RT)
-    ];
+  constructor() {
+    this.points = [];
     this.isClosed = false;
     this.setPoints = false;
     this.redraw = true;
@@ -184,7 +178,14 @@ class Path {
     }
     this.setStartEndPoints();
   }
-  draw() {
+  draw_mini() {
+    push();
+    scale(0.25);
+    this.draw(false);
+    pop();
+  }
+
+  draw(editor = true) {
     push();
     if (this.redraw) {
       this.draw_points = this.evenlyspaced(10, 1);
@@ -192,8 +193,20 @@ class Path {
       this.vert = vert;
       this.redraw = false;
     }
+    if (!editor) {
+      push();
+      translate(15, 15);
+      stroke(0);
+      strokeWeight(5);
+      for (let i = 0; i < this.vert.length - 1; i += 2) {
+        const a = this.vert[i];
+        const b = this.vert[i + 1];
+        line(a.x, a.y, b.x, b.y);
+      }
+      pop();
+    }
 
-    stroke(190);
+    stroke(90);
     strokeWeight(5);
     for (let i = 0; i < this.vert.length - 1; i += 2) {
       const a = this.vert[i];
@@ -201,29 +214,32 @@ class Path {
       line(a.x, a.y, b.x, b.y);
     }
 
-    strokeWeight(2);
-    stroke(255);
-    fill(0);
-    for (var i = 0; i < this.length(); i++) {
-      const pts = this.get(i);
-      if (!pts[1]) {
-        continue;
+    if (editor) {
+      strokeWeight(2);
+      stroke(255);
+      fill(0);
+      for (var i = 0; i < this.length(); i++) {
+        const pts = this.get(i);
+        if (!pts[1]) {
+          continue;
+        }
+        line(pts[1].x, pts[1].y, pts[0].x, pts[0].y);
+        line(pts[2].x, pts[2].y, pts[3].x, pts[3].y);
       }
-      line(pts[1].x, pts[1].y, pts[0].x, pts[0].y);
-      line(pts[2].x, pts[2].y, pts[3].x, pts[3].y);
-    }
-    noFill();
-    strokeWeight(10);
-    stroke(255);
-    for (var i = 0; i < this.points.length; i++) {
-      if (i % 3 == 0) {
-        stroke(255, 0, 0);
-      } else {
-        stroke(255, 255, 0);
+      noFill();
+      strokeWeight(10);
+      stroke(255);
+      for (var i = 0; i < this.points.length; i++) {
+        if (i % 3 == 0) {
+          stroke(255, 0, 0);
+        } else {
+          stroke(255, 255, 0);
+        }
+        const p = this.points[i];
+        point(p.x, p.y);
       }
-      const p = this.points[i];
-      point(p.x, p.y);
     }
+
     stroke(255);
     strokeWeight(5);
     for (const p of this.draw_points) {
