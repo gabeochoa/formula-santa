@@ -178,9 +178,9 @@ class Path {
     }
     this.setStartEndPoints();
   }
-  draw_mini() {
+  draw_mini(sc = 0.25) {
     push();
-    scale(0.25);
+    scale(sc);
     this.draw(false);
     pop();
   }
