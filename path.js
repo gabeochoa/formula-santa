@@ -1,3 +1,5 @@
+ROAD_WIDTH = 25;
+LINE_SPACE = 10;
 class Path {
   constructor() {
     this.points = [];
@@ -188,8 +190,8 @@ class Path {
   draw(editor = true) {
     push();
     if (this.redraw) {
-      this.draw_points = this.evenlyspaced(10, 1);
-      const [vert, tri] = this.gen_mesh(25);
+      this.draw_points = this.evenlyspaced(LINE_SPACE, 1);
+      const [vert, tri] = this.gen_mesh(ROAD_WIDTH);
       this.vert = vert;
       this.redraw = false;
     }
@@ -220,7 +222,7 @@ class Path {
       fill(0);
       for (var i = 0; i < this.length(); i++) {
         const pts = this.get(i);
-        if (!pts[1]) {
+        if (!pts[1] || !pts[2] || !pts[3]) {
           continue;
         }
         line(pts[1].x, pts[1].y, pts[0].x, pts[0].y);
@@ -277,7 +279,7 @@ class Path {
 
     for (let i = 0; i < this.length(); i++) {
       const p = this.get(i);
-      if (!p[1]) {
+      if (!p[1] || !p[2] || !p[3]) {
         continue;
       }
       const netLength =

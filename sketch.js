@@ -1,6 +1,7 @@
 let ground_height;
 let c;
 
+let AUTO_MOVE = true;
 let MOUSE_DOWN = false;
 let isGame = true;
 let path;
@@ -57,6 +58,9 @@ function keyTyped() {
     console.log("is game: ", isGame);
     return;
   }
+  if (key == "o") {
+    AUTO_MOVE = !AUTO_MOVE;
+  }
 
   if (isGame) {
     return;
@@ -96,7 +100,7 @@ function keyTyped() {
 
 function game_setup() {
   // something
-  c = new Car(200, 500);
+  c = new Car(210, 400);
 }
 
 function game_keyinput() {
@@ -115,24 +119,67 @@ function game_keyinput() {
   c.m_input(x, y);
 }
 
+function draw_road() {
+  push();
+  stroke(255);
+  strokeWeight(1);
+  noStroke();
+  const [_, closest] = closest_dp();
+  if (closest == -1) {
+    return;
+  }
+  fill(255);
+  const section_height = LINE_SPACE;
+  const section_width = ROAD_WIDTH * 25;
+  const perstep = 2;
+  const h = 120 + 50;
+  const w2 = width / 2;
+
+  const clos = path.points[path.idx(closest)];
+  stroke(0);
+
+  for (var i = 30; i >= 0; i--) {
+    fill(255, 25, 100);
+    const xx = w2 - section_width / 2 - i * perstep;
+    const cur = path.points[path.idx(i)];
+    const diff = vsub(clos, cur);
+    rect(
+      xx - abs(diff.x / 20),
+      section_height * i + h,
+      section_width + i * perstep * 2,
+      section_height
+    );
+  }
+
+  // c.draw_big();
+  pop();
+}
+
 function game_draw() {
   draw_background();
+  draw_road();
   draw_minimap();
 
   game_keyinput();
   game_move();
 }
 
-function gen_road_mult() {
-  let closest = width;
+function closest_dp() {
+  let closestd = width;
+  let closest = -1;
   for (var i = 0; i < path.draw_points.length; i++) {
     const p = path.draw_points[i];
     const d = p5.Vector.dist(c.pos, p);
-    if (d < closest) {
-      closest = d;
+    if (d < closestd) {
+      closestd = d;
+      closest = i;
     }
   }
+  return [closestd, closest];
+}
 
+function gen_road_mult() {
+  const [closest, _] = closest_dp();
   if (closest < 25) {
     return 0.98;
   }
@@ -145,12 +192,21 @@ function gen_road_mult() {
 function game_move() {
   // find if we are on the road
   let road_mult = gen_road_mult();
-  c.move(road_mult);
+  if (!AUTO_MOVE) {
+    c.move(road_mult, null);
+    return;
+  }
+
+  const [_, dot] = closest_dp();
+  c.move(road_mult, dot);
 }
 
 function draw_minimap() {
+  push();
+  translate(0, 0); //-150);
   path.draw_mini(sc);
   c.draw(sc);
+  pop();
 }
 function draw_background() {
   push();
@@ -159,19 +215,6 @@ function draw_background() {
   rect(0, 0, width, height);
   fill(137, 206, 250);
   rect(0, 0, width, height - ground_height);
-  pop();
-}
-
-function draw_road() {
-  road_width = width * (1 / 3);
-  push();
-  fill(137, 150, 150);
-  rect(
-    (width * 1) / 3,
-    height - ground_height,
-    width * (1 / 3) + 5,
-    ground_height
-  );
   pop();
 }
 
