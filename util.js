@@ -25,7 +25,7 @@ function export_path(inp) {
   inp.value(text);
 }
 
-function import_path(text) {
+function import_path(path, text) {
   console.log("importing");
   path.import_input(text);
 }

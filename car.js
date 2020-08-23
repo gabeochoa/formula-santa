@@ -46,7 +46,7 @@ class Car {
     this.acc.limit(1);
   }
 
-  move(road_mult = 0.98, c = null) {
+  move(path, road_mult = 0.98, c = null) {
     let target = createVector(0, 0);
     if (c != null) {
       const p3 = path.draw_points[(c + 3) % path.draw_points.length];

@@ -9,24 +9,25 @@
   </head>
   <body>
     <input id="cb" type="text" hidden>
-    <div style="padding-left: 15px">
-        zero to toggle game/editor
-        <div style="width: 50%">
-        <p style="white-space: pre-line">
-        Game Mode
-            o to turn off automove
-            g to enable offroad 
-        </p>
+    <div style="padding-left: 15px; display: flex;">
+        <div style="width: 40%">
+            <p style="white-space: pre-line">
+            0 (zero) to toggle game/editor
+
+            Game Mode
+                o to turn off automove
+                g to enable offroad 
+            </p>
         </div>
-        <div style="width: 50%">
-        <p style="white-space: pre-line">
-        Editor Mode
-            mouse drag to change course
-            t to add pivot point
-            r to remove point
-            c to toggle closed loop
-            o to straighten lines
-        </p>
+        <div style="width: 40%">
+            <p style="white-space: pre-line">
+            Editor Mode
+                mouse drag to change course
+                t to add pivot point
+                r to remove point
+                c to toggle closed loop
+                o to straighten lines
+            </p>
         </div>
         <br/>
         <p id="peerp" >
@@ -44,6 +45,8 @@
     <script src="path.js"></script>
     <script src="peer.js"></script>
     <script src="car.js"></script>
+    <script src="editor.js"></script>
+    <script src="game.js"></script>
     <script src="sketch.js"></script>
     <script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 

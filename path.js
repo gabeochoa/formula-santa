@@ -1,4 +1,4 @@
-ROAD_WIDTH = 25;
+ROAD_WIDTH = 30;
 LINE_SPACE = 10;
 class Path {
   constructor() {

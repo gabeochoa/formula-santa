@@ -8,9 +8,11 @@ let ENABLE_OFFROAD = false;
 let CAR_UPDATE = 25;
 let isGame = true;
 let path;
-const sc = 1; //0.5;
+const sc = 0.5;
 
 let p = null;
+let editor = null;
+let game = null;
 const cs = {
   NOTC: 0,
   QUERY: 1,
@@ -19,12 +21,13 @@ const cs = {
 };
 let peername;
 let myid;
-function setup() {
-  editor_setup();
-  game_setup();
-  p = new P();
 
-  const ptag = document.getElementById("peerp");
+function setup() {
+  editor = new Editor();
+  editor.setup();
+  game = new Game();
+  game.setup()
+  p = new P();
   const pinput = document.getElementById("peerinput");
   myid = document.getElementById("myid");
   peername = document.getElementById("peerid");
@@ -41,29 +44,21 @@ function join_peer(pinput) {
 
 function draw() {
   if (!isGame) {
-    editor_draw();
+    editor.draw();
   } else {
-    game_draw();
+  frameRate(15)
+    game.draw()
   }
 }
 
-function editor_setup() {
-  createCanvas(800, 600);
-  ground_height = 600 * (3 / 5);
-  path = new Path();
-  DEFAULT_PATH =
-    "W1sxMDAsMjAwXSxbMTUwLDE1MF0sWzI1MCwyNTBdLFszMDAsMjAwXSxbMzUwLDE1MF0sWzM2NS41LDE3OS41XSxbNDMxLDE1OV0sWzQ5Ni41LDEzOC41XSxbNDkwLjUsMjg2XSxbNTUwLDQxM10sWzYwOS41LDU0MF0sWzI5MSw0NTBdLFsyNjMsNTMzXSxbMTE5LjUsNTkzXSxbMzI3LDI2MV0sWzEyNywzNjddLFszOS41LDI4MF0sWzUwLDI1MF1d";
-
-  inp = createElement("textarea", DEFAULT_PATH);
-  inp.size(300);
-  import_path(inp);
-
-  button = createButton("export path");
-  button.mousePressed(() => export_path(inp));
-
-  button = createButton("import path");
-  button.mousePressed(() => import_path(inp));
+function draw(){
+  draw_background();
+  draw_road();
+  draw_minimap();
+  game.controls();
+  game.draw();
 }
+
 
 function inScreen() {
   return mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height;
@@ -79,73 +74,17 @@ function mouseReleased(event) {
   }
 }
 function keyTyped() {
-  // console.log("keytyped", key);
   if (key == "0") {
     isGame = !isGame;
     console.log("is game: ", isGame);
     return;
   }
-  if (key == "o") {
-    AUTO_MOVE = !AUTO_MOVE;
-  }
-  if (key == "g") {
-    ENABLE_OFFROAD = !ENABLE_OFFROAD;
-  }
-
   if (isGame) {
+    game.key_typed()
     return;
   }
   // EDITOR ONLY
-
-  if (key == "t") {
-    const mp = createVector(mouseX, mouseY);
-    console.log(mp);
-    path.add(mp);
-  }
-  if (key == "r") {
-    if (path.length() < 3) {
-      return;
-    }
-    let p = -1;
-    let bestDist = 9999;
-    const mp = createVector(mouseX, mouseY);
-    for (var i = 0; i < path.points.length; i++) {
-      const nd = abs(path.points[i].dist(mp));
-      if (nd < bestDist) {
-        bestDist = nd;
-        p = i;
-      }
-    }
-    if (p != -1) {
-      path.delete(p);
-    }
-  }
-  if (key == "c") {
-    path.toggleClose();
-  }
-  if (key == "o") {
-    path.toggleSetPoints();
-  }
-}
-
-function game_setup() {
-  c = new Car(210, 400);
-}
-
-function game_keyinput() {
-  let x = 0;
-  let y = 0;
-  if (keyIsDown(LEFT_ARROW)) {
-    x = -1;
-  } else if (keyIsDown(RIGHT_ARROW)) {
-    x = 1;
-  }
-  if (keyIsDown(UP_ARROW)) {
-    y = -1;
-  } else if (keyIsDown(DOWN_ARROW)) {
-    y = 1;
-  }
-  c.m_input(x, y);
+  editor.key_typed();
 }
 
 function draw_road() {
@@ -157,48 +96,54 @@ function draw_road() {
   if (closest == -1) {
     return;
   }
-  fill(255);
+
   const section_height = LINE_SPACE;
   const section_width = ROAD_WIDTH * 25;
   const perstep = 2;
   const h = 120 + 50;
   const w2 = width / 2;
-
-  const clos = path.points[path.idx(closest)];
+  const clos = editor.path.points[editor.path.idx(closest)];
   stroke(0);
 
   for (var i = 30; i >= 0; i--) {
     fill(255, 25, 100);
-    const xx = w2 - section_width / 2 - i * perstep;
-    const cur = path.points[path.idx(i)];
-    const diff = vsub(clos, cur);
     rect(
-      xx - abs(diff.x / 20),
-      section_height * i + h,
-      section_width + i * perstep * 2,
-      section_height
-    );
+      10, 
+      height/2 + i*10, 
+      width/2 - (10 - i), 
+      10
+    )
   }
 
-  // c.draw_big();
   pop();
+  return 
 }
 
-function game_draw() {
-  draw_background();
-  // draw_road();
-  draw_minimap();
-
-  game_keyinput();
-  game_move();
-}
-
+/**
+ * closest_dp
+ *  finds the closest point to the player's car 
+ * params
+ *  n/a
+ * returns
+ *  tuple(distance, point)
+ */
+last_time = 0;
+prev_closest = [null, null]
 function closest_dp() {
+  now = millis();
+  if(now > (last_time+100)){
+    last_time = now;
+    prev_closest = _closest_dp();
+  }
+  return prev_closest
+}
+
+function _closest_dp() {
   let closestd = width;
   let closest = -1;
-  for (var i = 0; i < path.draw_points.length; i++) {
-    const p = path.draw_points[i];
-    const d = p5.Vector.dist(c.pos, p);
+  for (var i = 0; i < editor.path.draw_points.length; i++) {
+    const p = editor.path.draw_points[i];
+    const d = p5.Vector.dist(game.c.pos, p);
     if (d < closestd) {
       closestd = d;
       closest = i;
@@ -207,6 +152,15 @@ function closest_dp() {
   return [closestd, closest];
 }
 
+/**
+ * gen_road_multi
+ *   finds the closest point's distance and returns a 
+ *   road speed multiplier 
+ * params
+ *  n/a
+ * returns
+ *  float multiplier
+ */
 function gen_road_mult() {
   const [closest, _] = closest_dp();
   if (ENABLE_OFFROAD) {
@@ -216,31 +170,20 @@ function gen_road_mult() {
     return 0.98;
   }
   if (closest < 50) {
-    return 0.8;
+    return 0.95;
   }
-  return 0.7;
-}
-
-function game_move() {
-  // find if we are on the road
-  let road_mult = gen_road_mult();
-  if (!AUTO_MOVE) {
-    c.move(road_mult, null);
-    return;
-  }
-
-  const [_, dot] = closest_dp();
-  c.move(road_mult, dot);
+  return 0.90;
 }
 
 function draw_minimap() {
   push();
   translate(0, 0); //-150);
-  path.draw_mini(sc);
-  c.draw(sc);
+  editor.path.draw_mini(sc);
+  game.c.draw(sc);
   if (fake_car) fake_car.draw(sc);
   pop();
 }
+
 function draw_background() {
   push();
   noStroke();
@@ -251,30 +194,3 @@ function draw_background() {
   pop();
 }
 
-function editor_draw() {
-  background(0);
-  // draw_background();
-  // draw_road();
-  path.draw();
-
-  if (MOUSE_DOWN) {
-    let p = -1;
-    let bestDist = 9999;
-    const mp = createVector(mouseX, mouseY);
-    for (var i = 0; i < path.points.length; i++) {
-      const point = path.points[i];
-      const nd = abs(point.dist(mp));
-      if (nd < bestDist) {
-        bestDist = nd;
-        p = i;
-      }
-    }
-    if (p != -1) {
-      path.update_point(p, mp);
-    }
-  }
-
-  fill(255);
-  textSize(12);
-  text("SetPoints: " + (path.setPoints ? "enabled" : "disabled"), 20, 10 + 1.5);
-}
