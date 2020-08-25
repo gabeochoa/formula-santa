@@ -34,12 +34,19 @@ class Car {
     this.angle = data["angle"];
   }
 
+  turn(dir){
+    const TURN_ANGLE = 0.05;
+    this.angle += dir * TURN_ANGLE
+    if(this.angle > TWO_PI || this.angle < -TWO_PI){
+      this.angle *= -1
+    }
+  }
+
   m_input(x, y) {
     const MAX_ACCEL = 0.05;
-    const TURN_ANGLE = 0.05;
     const i = createVector(0, y).mult(MAX_ACCEL);
     if (x != 0) {
-      this.angle += x * TURN_ANGLE;
+      this.turn(x)
     }
     i.rotate(this.angle);
     this.acc.add(i);

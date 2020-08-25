@@ -11,6 +11,9 @@ class Path {
   idx(i) {
     return (i + this.points.length) % this.points.length;
   }
+  ith(i){
+    return this.draw_points[(i + this.draw_points.length) % this.draw_points.length];
+  }
   add(v) {
     this.redraw = true;
     const secondlast = this.points[this.points.length - 2].copy();

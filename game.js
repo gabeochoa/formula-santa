@@ -29,13 +29,20 @@ class Game {
     }
   
     draw(){
-      // find if we are on the road
-      let road_mult = gen_road_mult();
-      if (!AUTO_MOVE) {
-        this.c.move(editor.path, road_mult, null);
-        return;
-      }
-      const [_, dot] = closest_dp();
-      this.c.move(editor.path, road_mult, dot);
+        this.controls();
+        // find if we are on the road
+        let road_mult = gen_road_mult();
+
+        if (!AUTO_MOVE) {
+            this.c.move(editor.path, road_mult, null);
+            return;
+        }
+
+        const [_, dot] = closest_dp();
+        const A = editor.path.ith(dot);
+        const B = editor.path.ith(dot + 3)
+        const AtoB = Math.atan2( (B.y - A.y) , (B.x - A.x))
+        this.c.angle = Math.PI/2 + AtoB;
+        this.c.move(editor.path, road_mult, dot);
     }
   }
